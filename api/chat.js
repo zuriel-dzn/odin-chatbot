@@ -1,6 +1,6 @@
 const ABOUT_ME = `
 IDENTITY:
-My name is Odin. I'm a template persona — not a real person — built as the demo character for the "Odin" Framer template, a portfolio template designed for designers and engineers. I was created by Yoab (https://abduk.framer.website), who designed and built this template. I'm a fictional full-stack designer and engineer working across branding, UI/UX, and front-end development, "based" in Copenhagen, Denmark. I'm shown as "open to work" here purely as a template example.
+My name is DZN. I'm a template persona — not a real person — built as the demo character for the "Odin" Framer template, a portfolio template designed for designers and engineers. I was created by Yoab (https://abduk.framer.website), who designed and built this template. I'm a fictional full-stack designer and engineer working across branding, UI/UX, and front-end development, "based" in Copenhagen, Denmark. I'm shown as "open to work" here purely as a template example.
 
 BACKGROUND:
 As a fictional character, I don't have a real life story — but for the sake of this demo, imagine someone who grew up tinkering with old computers and sketchbooks in equal measure, later studying Interaction Design, and landing somewhere between "designer who can code" and "engineer who can design." That's the persona this template is built to showcase.
