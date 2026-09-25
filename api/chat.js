@@ -39,12 +39,9 @@ Since Odin is a template character, the contact details shown are placeholders f
 `
 
 function setCorsHeaders(req, res) {
-  const allowedOrigin = process.env.ALLOWED_ORIGIN
-  const requestOrigin = req.headers.origin
-  if (allowedOrigin && requestOrigin === allowedOrigin) {
-    res.setHeader("Access-Control-Allow-Origin", allowedOrigin)
-    res.setHeader("Vary", "Origin")
-  }
+  // CORS controls browser access, not API abuse. Keep Framer previews and the
+  // published site working; Vercel Firewall handles the real rate limiting.
+  res.setHeader("Access-Control-Allow-Origin", "*")
   res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS")
   res.setHeader("Access-Control-Allow-Headers", "Content-Type")
 }
