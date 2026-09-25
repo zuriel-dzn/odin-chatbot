@@ -84,34 +84,52 @@ function cleanHistory(history) {
     })
 }
 
-function fallbackReply(question) {
+// The questions displayed in Framer are intentionally answered locally. That
+// makes the portfolio's guided path instant and consistent, while OpenRouter is
+// reserved for new, visitor-written questions.
+function getPresetReply(question) {
   const value = String(question || "").toLowerCase()
 
-  if (value.includes("technical") || value.includes("technology") || value.includes("engineer")) {
+  if (value.includes("technical foundation") || value.includes("technical background")) {
     return "My technical foundation helps me think about feasibility early and collaborate closely with engineers. I can understand implementation constraints, ask better questions, and shape experiences that are both useful and practical to build."
   }
-  if (value.includes("unique") || value.includes("approach")) {
+  if (value.includes("design approach") || value.includes("what makes your approach")) {
     return "I look beyond what people say to understand the behavior, friction, and reasons underneath it. Then I turn those insights into clear flows and prototypes, test early, and refine the work with users, stakeholders, and engineers."
   }
-  if (value.includes("workflow") || value.includes("process")) {
+  if (value.includes("workflow") || value.includes("design process")) {
     return "I start by understanding the people, goals, and constraints around a problem. Then I shape the flow, prototype ideas, test early, and refine the experience with feedback from users, stakeholders, and engineers."
   }
-  if (value.includes("favorite") || value.includes("enjoy")) {
+  if (value.includes("favorite parts") || value.includes("favorite part of design")) {
     return "My favorite parts of design are product strategy, prototyping, and problem-solving. I enjoy understanding the real problem, exploring new flows quickly, and finding a solution that feels creative without making the experience more complicated."
   }
-  if (value.includes("admit")) {
-    return "My work on Admit spans its student mobile experience, administrator platform, and public website. Through Nile Studio, I helped turn research and product goals into clearer workflows, tested the experience with users, and collaborated with engineers through implementation."
+  if (value.includes("product strategy")) {
+    return "I ground product strategy in the real behaviors, friction, and motivations I observe—not only what people say. From there, I define the core problem, map the opportunity, and validate a direction early so the team can build with clarity."
+  }
+  if (value.includes("which project") || value.includes("project should i explore") || value.includes("where should i start")) {
+    return "Start with Admit for the broadest view of my work. It connects a student mobile experience, administrator platform, and public website, showing how I work across product, UX, web, and engineering collaboration. After that, explore Infinite Studios for more web and brand work, or MLT for marketing systems and event-web experience."
+  }
+  if (value.includes("what kind of work") || value.includes("what work do you take")) {
+    return "Through DZN Studios, I take on select UX, product, web, and brand projects. Web design is a popular focus, and I also help with user flows, responsive design, information architecture, design systems, and marketing-facing experiences."
+  }
+  if (value.includes("work on admit") || value.includes("tell me about admit")) {
+    return "My work on Admit, through Nile Studio, spans three connected areas: the student mobile experience, administrator platform, and public website. I translated research into flows, prototypes, and UI; tested with users; and collaborated with a product manager and engineers as the platform grew."
+  }
+  if (value.includes("feedback") || value.includes("testing")) {
+    return "I use feedback and testing to understand more than whether someone likes an idea. I look for the friction, behavior, and reason underneath their response, then use that evidence to refine the flow, prototype, or message with the team."
+  }
+  if (value.includes("collaborate") && value.includes("engineer")) {
+    return "I involve engineers early so we can make informed trade-offs before a design is treated as finished. My technical foundation helps me ask better implementation questions, while their perspective helps make the final experience both thoughtful and buildable."
+  }
+  if (value.includes("dzn studios") || value.includes("what is dzn")) {
+    return "DZN Studios is my independent design practice. I work across product, UX, web, and brand experiences, partnering with teams to turn complex ideas into clear, useful digital work."
   }
 
-  if (
-  value.includes("which project") ||
-  value.includes("project should") ||
-  value.includes("explore first") ||
-  value.includes("where should i start")
-) {
-  return "Start with Admit for the broadest view of my work. It spans the student mobile experience, administrator platform, and public website, so it brings together product, UX, web, and collaboration with engineers. Restory Your Story is a great next look if you’re most interested in web design and clear service storytelling."
+  return null
 }
 
+function fallbackReply(question) {
+  const presetReply = getPresetReply(question)
+  if (presetReply) return presetReply
   return "I’m sorry, I couldn’t give that a clear answer just now. Please try asking again in a slightly different way."
 }
 
@@ -134,7 +152,11 @@ function visitorReply(content, question) {
     .trim()
 
   if (!cleaned) return fallbackReply(question)
-  if (/^(here(?:'s| is) (?:my )?thinking|thinking process|analysis:)/i.test(cleaned)) {
+  if (
+    /(?:here(?:'s| is) (?:my )?thinking|thinking process|analysis:|analyze user input|check the guidelines|return only (?:the )?final|ground rules:)/i.test(
+      cleaned
+    )
+  ) {
     return fallbackReply(question)
   }
 
@@ -157,6 +179,11 @@ export default async function handler(req, res) {
   }
   if (question.length > MAX_QUESTION_CHARS) {
     return res.status(400).json({ reply: "Please keep questions to 500 characters or fewer." })
+  }
+
+  const presetReply = getPresetReply(question)
+  if (presetReply) {
+    return res.status(200).json({ reply: presetReply, limited: false, preset: true })
   }
 
   const assistantName =
@@ -209,7 +236,9 @@ ${ABOUT_ME}`
           ...cleanHistory(history).slice(0, -1),
           { role: "user", content: question.trim() },
         ],
-        max_tokens: 200,
+        // Typed questions still use the model. A little more room prevents an
+        // otherwise good answer from ending mid-sentence.
+        max_tokens: 280,
         temperature: 0.4,
       }),
     })
