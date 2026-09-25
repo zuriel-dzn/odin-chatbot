@@ -197,7 +197,6 @@ ${ABOUT_ME}`
         ],
         max_tokens: 200,
         temperature: 0.4,
-        reasoning: { enabled: false, exclude: true },
       }),
     })
     const data = await r.json()
@@ -209,8 +208,17 @@ ${ABOUT_ME}`
           limited: true,
         })
       }
-      console.error("OpenRouter error:", r.status, data?.error?.code)
-      return res.status(502).json({ reply: "The chat is temporarily unavailable. Please try again shortly." })
+      console.error(
+        "OpenRouter error:",
+        r.status,
+        data?.error?.code,
+        data?.error?.message
+      )
+      return res.status(200).json({
+        reply: fallbackReply(question),
+        limited: false,
+        fallback: true,
+      })
     }
 
     return res.status(200).json({
@@ -219,6 +227,10 @@ ${ABOUT_ME}`
     })
   } catch (err) {
     console.error("Chat server error:", err.message)
-    return res.status(502).json({ reply: "The chat is temporarily unavailable. Please try again shortly." })
+    return res.status(200).json({
+      reply: fallbackReply(question),
+      limited: false,
+      fallback: true,
+    })
   }
 }
