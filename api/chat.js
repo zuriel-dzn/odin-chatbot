@@ -103,6 +103,15 @@ function fallbackReply(question) {
     return "My work on Admit spans its student mobile experience, administrator platform, and public website. Through Nile Studio, I helped turn research and product goals into clearer workflows, tested the experience with users, and collaborated with engineers through implementation."
   }
 
+  if (
+  value.includes("which project") ||
+  value.includes("project should") ||
+  value.includes("explore first") ||
+  value.includes("where should i start")
+) {
+  return "Start with Admit for the broadest view of my work. It spans the student mobile experience, administrator platform, and public website, so it brings together product, UX, web, and collaboration with engineers. Restory Your Story is a great next look if you’re most interested in web design and clear service storytelling."
+}
+
   return "I’m sorry, I couldn’t give that a clear answer just now. Please try asking again in a slightly different way."
 }
 
@@ -115,7 +124,12 @@ function visitorReply(content, question) {
   const withoutThinkTags = reply.replace(/^<think>[\s\S]*?<\/think>\s*/i, "")
   const cleaned = withoutThinkTags
     .split("\n")
-    .filter((line) => !/^\s*(user|assistant|content) safety\s*:\s*(safe|unsafe)\s*\.?\s*$/i.test(line))
+    .filter(
+      (line) =>
+        !/^\s*(user|assistant|content|response) safety(?:\s*:\s*(safe|unsafe))?\s*\.?\s*$/i.test(
+          line
+        )
+    )
     .join("\n")
     .trim()
 
